@@ -1,5 +1,6 @@
 import mimetypes
 
+import pandas as pd
 import sqlalchemy
 import uvicorn
 import os
@@ -44,6 +45,10 @@ async def read_static_file(request: Request, filename: str):
 class AgentInput(BaseModel):
     question: str
 
+
+class AgentInputDict(BaseModel):
+    question: str
+    data: dict
 
 class ReviewInput(BaseModel):
     question: str
@@ -205,6 +210,55 @@ async def db_slice(request: Request):
     }
 
     return JSONResponse(content=processed_data)
+
+
+@app.post("/api/get-sql/")
+async def get_sql(request: Request):
+    ans = ""
+    processed_data = {
+        "ans": ans,
+        "type": "success",
+        "msg": "处理成功"
+    }
+
+    return JSONResponse(content=processed_data)
+
+
+@app.post("/api/exe-sql/")
+async def exe_sql(request: Request, user_input: AgentInput):
+    AgentInput.question
+    ans = {}
+    processed_data = {
+        "ans": ans,
+        "type": "success",
+        "msg": "处理成功"
+    }
+
+    return JSONResponse(content=processed_data)
+
+
+@app.post("/api/get-graph/")
+async def get_graph_api(request: Request, user_input: AgentInputDict):
+    df = pd.DataFrame.from_dict(user_input.data)
+    user_input.question, df
+    ans = ""
+    if ans:
+        processed_data = {
+            "question": user_input.question,
+            "ans": ans,
+            "type": "success",
+            "msg": "处理成功"
+        }
+    else:
+        processed_data = {
+            "question": user_input.question,
+            "ans": "",
+            "type": "error",
+            "msg": "处理失败，请换个问法吧"
+        }
+    return JSONResponse(content=processed_data)
+
+
 
 if __name__ == "__main__":
     uvicorn.run(app, host=config_data['server_host'], port=config_data['server_port'])
