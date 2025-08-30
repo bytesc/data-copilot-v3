@@ -1,10 +1,11 @@
 import httpx
+from pywebio.session import set_env
+
 from utils.get_config import config_data
 
 from pywebio.input import input, TEXT, textarea
 from pywebio.output import put_text, put_html, put_markdown, clear, put_loading
-from pywebio import start_server
-
+from pywebio import start_server, config
 
 def ai_agent_api(question: str, path: str = "/ask-agent/", url="http://127.0.0.1:" + str(config_data["server_port"])):
     # 使用 httpx 发送请求到另一个服务器的 /ask-agent/ 接口
@@ -22,8 +23,12 @@ def ai_agent_api(question: str, path: str = "/ask-agent/", url="http://127.0.0.1
             # 处理请求错误
             return None
 
-
+@config(theme="dark")
 def main():
+    set_env(output_max_width='90%')
+    with open("DatasetExplorer.html", 'r', encoding='utf-8') as file:
+        html_content = file.read()
+    put_html(html_content)
     # 初始化对话历史
     conversation_history = []
 
