@@ -1,22 +1,18 @@
-mysql: mysql+pymysql://root:123456@127.0.0.1/med_data
-# classicmodels data_copilot
+# config
+server_port: 8009
+server_host: "0.0.0.0"
+mysql: "mysql+pymysql://root:123456@localhost:3306/med_data"
 
-ai:
-  tries: 1
-  wait: 100
-  data_rows: 2
+static_path: "http://127.0.0.1:8009/"
 
-llm:
-  model_provider: openai #qwen #openai
-  model: deepseek-chat
-  url: "https://api.deepseek.com/v1/"
-
-# qwen1.5-72b-chat   qwen1.5-110b-chat
-# qwen-turbo  qwen-plus   qwen-max   qwen-long
-# https://dashscope.aliyun.com/
-
+model_name: "qwen-max"
 # glm-4
-# https://open.bigmodel.cn
+# deepseek-chat
+# qwen-max
+# gpt-4o-mini
 
-
-server_port: 8087
+model_url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
+# https://open.bigmodel.cn/api/paas/v4/
+# https://api.deepseek.com/v1/
+# https://dashscope.aliyuncs.com/compatible-mode/v1
+# https://api.openai.com/v1

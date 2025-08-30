@@ -21,13 +21,11 @@ IMPORTANT_MODULE = ["import math"]
 THIRD_MODULE = ["import pandas as pd", "import numpy as np", "import geopy"]
 
 def get_cot_code_prompt(question):
-
-    # rag_ans = rag_from_policy_func(question,llm,engine)
     rag_ans = ""
+    # rag_ans = rag_from_policy_func(question,llm,engine)
     # print(rag_ans)
-
-    knowledge = "\nBase knowledge: \n" + rag_ans + "\n"
-    database = ""
+    knowledge = ""
+    # knowledge = "\nBase knowledge: \n" + rag_ans + "\n"
 
     function_set, function_info, function_import = get_function_info(question, llm)
     # print(function_info)
@@ -35,8 +33,9 @@ def get_cot_code_prompt(question):
         return "solved", rag_ans, []
     print(function_info)
 
+    database = ""
     if query_database in function_set:
-        data_prompt = get_db_info_prompt(engine, simple=True)
+        data_prompt = get_db_info_prompt(engine, simple=False, example=False)
         database = "\nThe database content: \n" + data_prompt + "\n"
 
     pre_prompt = """ 
@@ -91,7 +90,7 @@ def cot_agent(question, retries=2, print_rows=10):
         print(rag_ans)
         # print(cot_prompt)
         if cot_prompt == "solved":
-            return rag_ans
+            return rag_ans, ""
         else:
             err_msg = ""
             for j in range(retries):
@@ -134,13 +133,13 @@ def cot_agent(question, retries=2, print_rows=10):
 
                     logging.info(f"Question: {question}\nAnswer: {ans}\nCode: {code}\n")
 
-                    return ans
+                    return ans, code
                 except Exception as e:
                     err_msg = str(e) + "\n```python\n" + code + "\n```\n"
                     exp = e
                     print(e)
                     continue
-    return None
+    return None, None
 
 
 def exe_cot_code(code, retries=2, print_rows=10):

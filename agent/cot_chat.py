@@ -1,17 +1,12 @@
-
 import logging
-
 
 from .tools.tools_def import engine, llm, query_database
 
 from .tools.copilot.sql_code import get_db_info_prompt
 
-
 from .tools.get_function_info import get_function_info
 
 from .tools.copilot.utils.call_llm_test import call_llm
-
-from .tools.custom_tools_def import get_api_result
 
 
 def get_cot_chat_prompt(question):
@@ -27,7 +22,6 @@ def get_cot_chat_prompt(question):
     if function_info == "solved":
         return "solved", rag_ans, []
     print(function_info)
-
 
     if query_database in function_set:
         data_prompt = get_db_info_prompt(engine, simple=True)
@@ -75,7 +69,7 @@ you can choose one of the approaches and provide more information needed.
 
     cot_prompt = "question:" + question + knowledge + database + pre_prompt + \
                  function_prompt + str(function_info) + \
-                  example_ans
+                 example_ans
     return cot_prompt, rag_ans, function_import
 
 

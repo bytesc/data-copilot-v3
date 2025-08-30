@@ -58,13 +58,13 @@ class ReviewInput(BaseModel):
 
 @app.post("/api/ask-agent/")
 async def ask_agent(request: Request, user_input: AgentInput):
-    ans = cot_agent(user_input.question)
+    ans, code = cot_agent(user_input.question)
     print(ans)
     if ans:
         processed_data = {
             "question": user_input.question,
             "ans": ans,
-            "map": map,
+            "map": "",
             "type": "success",
             "msg": "处理成功"
         }

@@ -24,33 +24,31 @@ def ai_agent_api(question: str, path: str = "/ask-agent/", url="http://127.0.0.1
 
 
 def main():
-    ans = None
-    question_list = ""
-    while 1:
-        # put_text("Ask your question to the AI Agent:")
-        question = textarea("Enter your question here:", type=TEXT, rows=2)
-        put_markdown("## " + question)
-        question_list = question_list + question
+    # 初始化对话历史
+    conversation_history = []
 
-        req = question
-        if ans:
-            with put_loading():
-                response = ai_agent_api(ans, "/api/agent-summary/")
-                summary = response
-                put_markdown("## Ans Summary")
-                put_markdown(summary, sanitize=False)
-                req = question_list + """
-                This is the summary of the last conversation:
-                            """ + summary
+    while True:
+        question = textarea("Enter your question here:", type=TEXT, rows=2)
+
+        put_markdown("## " + question)
+
+        if conversation_history:
+            context = "\n".join(conversation_history[-6:])
+            full_question = f"Context:\n{context}\n\nCurrent Question:\n{question}"
+        else:
+            full_question = question
 
         with put_loading():
-            print(req)
-            response = ai_agent_api(req, "/api/ask-agent/")
-            ans = response
-        # print(response)
+            response = ai_agent_api(full_question, "/api/ask-agent/")
+
         # 检查响应并显示结果
         if response:
+            # 将当前问答对添加到历史中
+            conversation_history.append(f"Q: {question}")
+            conversation_history.append(f"A: {response}")
+
             put_markdown(response, sanitize=False)
+
         else:
             put_text("Failed to get a response from the AI Agent.")
 
