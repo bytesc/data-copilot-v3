@@ -16,7 +16,6 @@ from .utils.final_output_parse import df_to_markdown, wrap_html_url_with_markdow
 from .utils.final_output_parse import wrap_png_url_with_markdown_image, is_png_url, is_iframe_tag
 from .utils.pd_to_walker import pd_to_walker
 
-from .tools.custom_tools_def import get_api_result
 
 IMPORTANT_MODULE = ["import math"]
 THIRD_MODULE = ["import pandas as pd", "import numpy as np", "import geopy"]
@@ -88,12 +87,11 @@ def func():
 def cot_agent(question, retries=2, print_rows=10):
     exp = None
     for i in range(3):
-        html_map = ""
         cot_prompt, rag_ans, function_import = get_cot_code_prompt(question)
         print(rag_ans)
         # print(cot_prompt)
         if cot_prompt == "solved":
-            return rag_ans, None
+            return rag_ans
         else:
             err_msg = ""
             for j in range(retries):
@@ -123,7 +121,6 @@ def cot_agent(question, retries=2, print_rows=10):
                         elif isinstance(item, str) and is_png_url(item):
                             cot_ans += "\n" + wrap_png_url_with_markdown_image(item) + "\n"
                         elif is_iframe_tag(str(item)):
-                            html_map = str(item)
                             cot_ans += "\n" + str(item) + "\n"
                         else:
                             cot_ans += "\n" + str(item) + "\n"
@@ -137,13 +134,13 @@ def cot_agent(question, retries=2, print_rows=10):
 
                     logging.info(f"Question: {question}\nAnswer: {ans}\nCode: {code}\n")
 
-                    return ans, html_map
+                    return ans
                 except Exception as e:
                     err_msg = str(e) + "\n```python\n" + code + "\n```\n"
                     exp = e
                     print(e)
                     continue
-    return None, None
+    return None
 
 
 def exe_cot_code(code, retries=2, print_rows=10):

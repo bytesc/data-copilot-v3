@@ -58,7 +58,7 @@ class ReviewInput(BaseModel):
 
 @app.post("/api/ask-agent/")
 async def ask_agent(request: Request, user_input: AgentInput):
-    ans, map = cot_agent(user_input.question)
+    ans = cot_agent(user_input.question)
     print(ans)
     if ans:
         processed_data = {
