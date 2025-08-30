@@ -16,9 +16,9 @@ from .utils.final_output_parse import df_to_markdown, wrap_html_url_with_markdow
 from .utils.final_output_parse import wrap_png_url_with_markdown_image, is_png_url, is_iframe_tag
 from .utils.pd_to_walker import pd_to_walker
 
-
 IMPORTANT_MODULE = ["import math"]
 THIRD_MODULE = ["import pandas as pd", "import numpy as np", "import geopy"]
+
 
 def get_cot_code_prompt(question):
     rag_ans = ""
@@ -50,7 +50,7 @@ None or empty DataFrame return handling for each function call is extremely impo
     function_prompt = """ 
 Here is the functions you can import and use:
 """
-    module_prompt = "You can only use the third party function in "+str(THIRD_MODULE)+" !!!"
+    module_prompt = "You can only use the third party function in " + str(THIRD_MODULE) + " !!!"
 
     example_code = """
 Here is an example: 
@@ -85,7 +85,7 @@ def func():
 
 def cot_agent(question, retries=2, print_rows=10):
     exp = None
-    for i in range(3):
+    for i in range(retries):
         cot_prompt, rag_ans, function_import = get_cot_code_prompt(question)
         print(rag_ans)
         # print(cot_prompt)
@@ -125,11 +125,13 @@ def cot_agent(question, retries=2, print_rows=10):
                             cot_ans += "\n" + str(item) + "\n"
                         print(item)
 
-                    ans = "### Base knowledge: \n" + rag_ans + "\n\n"
+                    ans = ""
+                    if rag_ans and rag_ans != "":
+                        ans += "### Base knowledge: \n" + rag_ans + "\n\n"
                     ans += "### COT Result: \n" + cot_ans + "\n"
                     # print(ans)
-                    review_ans = get_ans_review(question, ans, code)
-                    ans += "## Summarize and review: \n" + review_ans + "\n"
+                    # review_ans = get_ans_review(question, ans, code)
+                    # ans += "## Summarize and review: \n" + review_ans + "\n"
 
                     logging.info(f"Question: {question}\nAnswer: {ans}\nCode: {code}\n")
 
@@ -195,6 +197,7 @@ def get_cot_code(question, retries=2):
             # code = insert_yield_statements(code)
             code = insert_lines_into_function(code, function_import)
             code = insert_lines_into_function(code, IMPORTANT_MODULE)
+            code = insert_lines_into_function(code, THIRD_MODULE)
             print(code)
             if code is None:
                 continue

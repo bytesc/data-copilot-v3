@@ -10,11 +10,13 @@ pd.set_option('display.max_columns', None)
 
 def get_llm_data_explanation_func(question, data, llm, max_length=10000):
     data_str = data.to_string()
+    example_prompt = ""
     if len(data_str) > max_length:
         sampling_ratio = max_length / len(data_str)
         n_rows = max(1, int(len(data) * sampling_ratio))
         sampled_data = data.sample(n=n_rows)
         data_str = sampled_data.to_string()
+        example_prompt = "\nThe given data knowledge sampling example, actual data length is "+str(len(data))+".\n"
 
     pre_prompt = """
 Please explain the data provided base on the data and question provided.
@@ -33,7 +35,7 @@ Remind:
 4. Just describe the data, do not use any phrase to explain what you are doing.
 """
 
-    final_prompt = pre_prompt + question + "\n" + data_prompt + end_prompt
+    final_prompt = pre_prompt + question + "\n" + example_prompt + data_prompt + end_prompt
     ans = call_llm_test.call_llm(final_prompt, llm)
 
     return ans.content

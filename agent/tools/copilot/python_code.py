@@ -66,7 +66,6 @@ without any additional comments, explanations or cmds !!!
 
 
 def get_py_code(question, llm, retries=3):
-
     pre_prompt = """
 Define a Python function called `func` 
 that takes no input parameter
@@ -120,7 +119,7 @@ def draw_graph_func(question, data, llm, retries=2):
                 result = execute_py_code_with_data(code, data, assert_png_file)
                 return result
             except Exception as e:
-                err_msg = str(e) + "\n```python\n" +code+"\n```\n"
+                err_msg = str(e) + "\n```python\n" + code + "\n```\n"
                 print(e)
                 exp = e
                 continue
