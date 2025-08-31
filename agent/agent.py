@@ -2,6 +2,7 @@ import logging
 
 import pandas as pd
 
+from .tools.base_knowledge.get_base_knowledge import get_base_knowledge
 from .tools.tools_def import engine, llm, query_database
 
 from .tools.copilot.python_code import get_py_code
@@ -17,15 +18,15 @@ from .utils.final_output_parse import wrap_png_url_with_markdown_image, is_png_u
 from .utils.pd_to_walker import pd_to_walker
 
 IMPORTANT_MODULE = ["import math"]
-THIRD_MODULE = ["import pandas as pd", "import numpy as np", "import geopy"]
+THIRD_MODULE = ["import pandas as pd", "import numpy as np"]
 
 
 def get_cot_code_prompt(question):
     rag_ans = ""
-    # rag_ans = rag_from_policy_func(question,llm,engine)
-    # print(rag_ans)
     knowledge = ""
+    # rag_ans = get_base_knowledge()
     # knowledge = "\nBase knowledge: \n" + rag_ans + "\n"
+    # print(rag_ans)
 
     function_set, function_info, function_import = get_function_info(question, llm)
     # print(function_info)
@@ -46,6 +47,7 @@ Please yield the result of each step and function call!
 Please yield report many times during the function!!! not only yield at last! 
 Please yield the tables used before query database function!!!
 None or empty DataFrame return handling for each function call is extremely important.
+If the user just ask to introduce or explain something, just yield the answer text in code without function call.
 """
     function_prompt = """ 
 Here is the functions you can import and use:
@@ -126,8 +128,8 @@ def cot_agent(question, retries=2, print_rows=10):
                         print(item)
 
                     ans = ""
-                    if rag_ans and rag_ans != "":
-                        ans += "### Base knowledge: \n" + rag_ans + "\n\n"
+                    # if rag_ans and rag_ans != "":
+                    #     ans += "### Base knowledge: \n" + rag_ans + "\n\n"
                     ans += "### COT Result: \n" + cot_ans + "\n"
                     # print(ans)
                     # review_ans = get_ans_review(question, ans, code)

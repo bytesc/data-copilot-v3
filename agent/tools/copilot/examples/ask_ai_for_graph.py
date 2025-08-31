@@ -24,6 +24,9 @@ def func(data):
     # generate code to perform operations here
     return path
 ```
+
+Remind:
+- Provide a should introduction of the corhort brest dataset included. and Illustrate the age distribution. draw graph
 """
     if not tmp_file:
         return "question:"+question + pre_prompt + "`"+generate_img_path()+"`"+example_code
