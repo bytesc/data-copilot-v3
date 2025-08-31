@@ -26,7 +26,7 @@ def func(data):
 ```
 
 Remind:
-- Provide a should introduction of the corhort brest dataset included. and Illustrate the age distribution. draw graph
+- Pay attention to the scale division of the horizontal axis and the orientation of the text to avoid excessive density of the horizontal axis and overlapping text!!!
 """
     if not tmp_file:
         return "question:"+question + pre_prompt + "`"+generate_img_path()+"`"+example_code

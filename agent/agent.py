@@ -24,8 +24,8 @@ THIRD_MODULE = ["import pandas as pd", "import numpy as np"]
 def get_cot_code_prompt(question):
     rag_ans = ""
     knowledge = ""
-    # rag_ans = get_base_knowledge()
-    # knowledge = "\nBase knowledge: \n" + rag_ans + "\n"
+    rag_ans = get_base_knowledge()
+    knowledge = "\nBase knowledge: \n" + rag_ans + "\n"
     # print(rag_ans)
 
     function_set, function_info, function_import = get_function_info(question, llm)
