@@ -1,5 +1,7 @@
 def get_base_knowledge(key=""):
     knowledge = """
+We have two different Dataset:    
+    
 # BRSET Dataset Overview
 ## Introduction
 The BRSET (Brazilian Multilabel Ophthalmological Dataset) was developed by researchers from São Paulo Federal University and Massachusetts Institute of Technology to advance machine learning research in ophthalmology. BRSET represents the first publicly available Brazilian multilabel ophthalmological dataset, offering a comprehensive resource for developing AI models to predict demographic characteristics and multi-label disease classification using retinal fundus photos. The dataset addresses the critical need for representative data from low and middle-income countries to reduce bias in ophthalmological AI systems.
