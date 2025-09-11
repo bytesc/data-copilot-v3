@@ -4,13 +4,15 @@ import pandas as pd
 import sqlalchemy
 import uvicorn
 import os
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Form
 from fastapi.responses import FileResponse, HTMLResponse, Response
+from fastapi import File, UploadFile, HTTPException
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from starlette.responses import JSONResponse
 
 from agent.cot_chat import get_cot_chat
+from data_access.insert_data_from_csv import process_csv_to_database
 from utils.get_config import config_data
 
 from agent.agent import exe_cot_code, get_cot_code, cot_agent
@@ -257,6 +259,26 @@ async def get_graph_api(request: Request, user_input: AgentInputDict):
             "msg": "处理失败，请换个问法吧"
         }
     return JSONResponse(content=processed_data)
+
+
+@app.post("/upload-csv/")
+async def upload_csv(
+        file: UploadFile = File(..., description="CSV file"),
+        table_name: str = Form("uploaded_data")
+):
+    if not file.filename.lower().endswith('.csv'):
+        raise HTTPException(
+            status_code=400,
+            detail="Only CSV files are supported"
+        )
+    try:
+        content = await file.read()
+        if len(content) == 0:
+            raise HTTPException(status_code=400, detail="Uploaded file is empty")
+        result = process_csv_to_database(content, table_name)
+        return JSONResponse(content=result)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"File processing error: {str(e)}")
 
 
 
