@@ -12,12 +12,14 @@ from pydantic import BaseModel
 from starlette.responses import JSONResponse
 
 from agent.cot_chat import get_cot_chat
+from agent.data_comment import get_llm_data_comment_func
 from data_access.insert_data_from_csv import process_csv_to_database
 from utils.get_config import config_data
 
 from agent.agent import exe_cot_code, get_cot_code, cot_agent
 from agent.summary import get_ans_summary
 from agent.ans_review import get_ans_review
+from utils.process_file import process_file_content
 
 # DATABASE_URL = config_data['mysql']
 # engine = sqlalchemy.create_engine(DATABASE_URL)
@@ -279,6 +281,38 @@ async def upload_csv(
         return JSONResponse(content=result)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"File processing error: {str(e)}")
+
+
+@app.post("/upload-txt/")
+async def upload_txt(
+        file: UploadFile = File(..., description="支持 txt, doc, docx, pdf 文件"),
+        table_name: str = Form("uploaded_data")
+):
+    allowed_extensions = {'.txt', '.doc', '.docx', '.pdf'}
+    file_extension = file.filename[file.filename.rfind('.'):].lower()
+
+    if file_extension not in allowed_extensions:
+        raise HTTPException(
+            status_code=400,
+            detail="Only txt, doc, docx, pdf files are supported"
+        )
+
+    try:
+        content = await file.read()
+        if len(content) == 0:
+            raise HTTPException(status_code=400, detail="Uploaded file is empty")
+
+        extracted_text = process_file_content(content, file_extension)
+        result = get_llm_data_comment_func(extracted_text, table_name)
+        result = {
+            "status": "success",
+            "table_name": table_name,
+            "extracted_text_length": len(extracted_text),
+            "preview": extracted_text[:500] + "..." if len(extracted_text) > 500 else extracted_text
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"File processing error: {str(e)}")
+    return JSONResponse(content=result)
 
 
 
