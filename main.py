@@ -12,7 +12,7 @@ from pydantic import BaseModel
 from starlette.responses import JSONResponse
 
 from agent.cot_chat import get_cot_chat
-from agent.data_comment import get_llm_data_comment_func
+from agent.data_comment import get_llm_data_comment
 from data_access.insert_data_from_csv import process_csv_to_database
 from utils.get_config import config_data
 
@@ -303,7 +303,7 @@ async def upload_txt(
             raise HTTPException(status_code=400, detail="Uploaded file is empty")
 
         extracted_text = process_file_content(content, file_extension)
-        result = get_llm_data_comment_func(extracted_text, table_name)
+        result = get_llm_data_comment(extracted_text, table_name)
         result = {
             "status": "success",
             "table_name": table_name,

@@ -43,7 +43,26 @@ def upload_csv_api(file_content, table_name="uploaded_data"):
             return {"error": f"{str(e)}"}
 
 
-def handle_upload():
+def upload_doc_api(file_content, filename, table_name="uploaded_data"):
+    url = f"http://127.0.0.1:{config_data['server_port']}/upload-txt/"
+    files = {
+        'file': (filename, file_content, 'application/octet-stream')
+    }
+    data = {
+        'table_name': table_name
+    }
+    with httpx.Client(timeout=30.0) as client:
+        try:
+            response = client.post(url, files=files, data=data)
+            if response.status_code == 200:
+                return response.json()
+            else:
+                return {"error": f"{response.status_code}", "details": response.text}
+        except httpx.RequestError as e:
+            return {"error": f"{str(e)}"}
+
+
+def handle_csv_upload():
     file_info = file_upload(
         "Please select a CSV file to upload",
         accept=".csv",
@@ -69,6 +88,32 @@ def handle_upload():
             put_markdown(f"Message: {result.get('message', 'N/A')}")
 
 
+def handle_doc_upload():
+    file_info = file_upload(
+        "Please select a document file to upload (txt, doc, docx, pdf)",
+        accept=".txt,.doc,.docx,.pdf",
+        help_text="Select the document file you want to upload"
+    )
+
+    if file_info:
+        table_name = input("Enter table name (optional, default is 'uploaded_data')", type=TEXT,
+                           placeholder="uploaded_data", required=False)
+        if not table_name:
+            table_name = "uploaded_data"
+        with put_loading(shape="grow", color="primary"):
+            result = upload_doc_api(file_info['content'], file_info['filename'], table_name)
+            print(result)
+
+        if result.get('error'):
+            toast(f"Upload failed: {result.get('error')}", color='error')
+        else:
+            toast("File uploaded successfully!", color='success')
+            put_markdown("### Upload Results")
+            put_markdown(f"Table name: `{result.get('table_name', table_name)}`")
+            put_markdown(f"Extracted text length: {result.get('extracted_text_length', 'N/A')}")
+            put_markdown(f"Preview: {result.get('preview', 'N/A')}")
+
+
 @config(theme="dark")
 def main():
     set_env(output_max_width='90%')
@@ -77,7 +122,8 @@ def main():
     with open("DatasetExplorer.html", 'r', encoding='utf-8') as file:
         html_content = file.read()
     put_html(html_content)
-    put_buttons(['Upload CSV File'], onclick=[handle_upload])
+    put_buttons(['Upload CSV File', 'Upload Document File'],
+                onclick=[handle_csv_upload, handle_doc_upload])
     conversation_history = []
 
     while True:
@@ -105,4 +151,4 @@ def main():
 
 # Start PyWebIO application
 if __name__ == '__main__':
-    start_server(main, port=8010)
+    start_server(main, port=8011)
