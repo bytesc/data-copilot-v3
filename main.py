@@ -188,7 +188,7 @@ async def cot_chat(request: Request, user_input: AgentInput):
     return JSONResponse(content=processed_data)
 
 
-from agent.tools.copilot.utils.read_db import get_rows_from_all_tables
+from agent.tools.copilot.utils.read_db import get_rows_from_all_tables, get_table_comments_dict
 from agent.tools.tools_def import engine, llm
 @app.post("/api/db-slice/")
 async def db_slice(request: Request):
@@ -215,6 +215,17 @@ async def db_slice(request: Request):
 
     return JSONResponse(content=processed_data)
 
+
+@app.post("/api/table-comments/")
+async def table_comments(request: Request):
+    # 获取所有表的注释
+    table_comments = get_table_comments_dict(engine, None)
+    processed_data = {
+        "ans": table_comments,
+        "type": "success",
+        "msg": "表注释获取成功"
+    }
+    return JSONResponse(content=processed_data)
 
 @app.post("/api/get-sql/")
 async def get_sql(request: Request):

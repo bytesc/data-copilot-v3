@@ -10,5 +10,5 @@ The BRSET (Brazilian Multilabel Ophthalmological Dataset) was developed by resea
 ## Introduction
 The mBRSET (Mobile Brazilian Retinal Dataset) was developed by researchers from Sao Paulo Federal University and Massachusetts Institute of Technology, to support research in portable diabetic retinopathy (DR) screening. mBRSET dataset represents the first publicly available collection of retinal images captured via handheld retinal cameras in real-life, high-burden scenarios, offering a comprehensive resource for addressing the challenges of diabetic retinopathy screening and management in underserved populations.
     """
-
+    knowledge = ""
     return knowledge

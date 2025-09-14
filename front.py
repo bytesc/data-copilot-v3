@@ -1,11 +1,16 @@
 import httpx
 from pywebio.session import set_env
-from pywebio.input import input, TEXT, textarea, file_upload
-from pywebio.output import put_text, put_html, put_markdown, clear, put_loading, toast, popup, put_buttons
+from pywebio.input import input, TEXT, textarea, file_upload, select, checkbox
+from pywebio.output import put_text, put_html, put_markdown, clear, put_loading, toast, popup, put_buttons, \
+    put_collapse, put_table
 from pywebio import start_server, config
+
+from data_access.read_db import get_rows_from_all_tables, get_table_comments_dict
 from utils.get_config import config_data
 import base64
 
+SELECT_TABLES=""
+SELECT_LABELS=""
 
 def ai_agent_api(question: str, path: str = "/ask-agent/", url="http://127.0.0.1:" + str(config_data["server_port"])):
     # Use httpx to send a request to the /ask-agent/ endpoint of another server
@@ -114,23 +119,63 @@ def handle_doc_upload():
             put_markdown(f"Preview: {result.get('preview', 'N/A')}")
 
 
-@config(theme="dark")
-def main():
-    set_env(output_max_width='90%')
+def handle_table_selection(table_options):
+    global SELECT_TABLES, SELECT_LABELS
+    checkbox_options = [(opt['label'], opt['value']) for opt in table_options]
+    selected_tables = checkbox(
+        "Select tables: ",
+        options=checkbox_options,
+        inline=True
+    )
+    SELECT_TABLES = selected_tables
+    put_markdown(f"You have selected: `{', '.join(selected_tables)}`")
+    if selected_tables:
+        put_markdown("### Selected Tables")
+        selected_labels = []
+        for table_value in selected_tables:
+            for opt in table_options:
+                if opt['value'] == table_value:
+                    selected_labels.append(opt['label'])
+                    break
+        SELECT_LABELS = selected_labels
 
-    # Load HTML content
-    with open("DatasetExplorer.html", 'r', encoding='utf-8') as file:
-        html_content = file.read()
-    put_html(html_content)
-    put_buttons(['Upload CSV File', 'Upload Document File'],
-                onclick=[handle_csv_upload, handle_doc_upload])
+
+# @config(theme="dark")
+def main():
+    global SELECT_TABLES, SELECT_LABELS
+    put_markdown("# Data-Copilot")
+    # set_env(output_max_width='90%')
+    # # Load HTML content
+    # with open("DatasetExplorer.html", 'r', encoding='utf-8') as file:
+    #     html_content = file.read()
+    # put_html(html_content)
+    first_five_rows = get_rows_from_all_tables()
+    # print(first_five_rows)
+
+    table_comments = get_table_comments_dict()
+    table_options = []
+    for table_name, comment in table_comments.items():
+        display_name = f"{table_name} ({comment})" if comment else table_name
+        table_options.append({'label': display_name, 'value': table_name})
+
+    # 添加表格选择和上传按钮
+    put_buttons(['Select Tables', 'Upload CSV File', 'Upload Document File'],
+                onclick=[lambda: handle_table_selection(table_options), handle_csv_upload, handle_doc_upload])
+
+    with put_collapse(f"Tables"):
+        for table_name, rows in first_five_rows.items():
+            with put_collapse(f"table {table_name}"):
+                put_text(f"table {table_name} first 5 rows:")
+                put_table([rows.columns.tolist()] + rows.values.tolist())
+
     conversation_history = []
 
     while True:
+        table_pre = ""
+        if SELECT_TABLES != "":
+            table_pre = "use table:" + str(SELECT_TABLES) + " only!!! \n" + str(SELECT_LABELS) + "\n"
         question = textarea("Enter your question here:", type=TEXT, rows=2)
-
         put_markdown("## " + question)
-
         if conversation_history:
             context = "\n".join(conversation_history[-6:])
             full_question = f"Context:\n{context}\n\nCurrent Question:\n{question}"
@@ -138,7 +183,7 @@ def main():
             full_question = question
 
         with put_loading():
-            response = ai_agent_api(full_question, "/api/ask-agent/")
+            response = ai_agent_api(table_pre + full_question, "/api/ask-agent/")
         if response:
             conversation_history.append(f"Q: {question}")
             conversation_history.append(f"A: {response}")
@@ -149,6 +194,5 @@ def main():
             put_text("Failed to get a response from the AI Agent.")
 
 
-# Start PyWebIO application
 if __name__ == '__main__':
-    start_server(main, port=8011)
+    start_server(main, port=8015, debug=True)

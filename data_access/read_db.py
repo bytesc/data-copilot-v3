@@ -129,6 +129,31 @@ def get_data_from_db():
     return tables_data, keys, comments
 
 
+def get_table_comments_dict(tables=None):
+    inspector = inspect(engine)
+    if not tables:
+        table_names = inspector.get_table_names()
+    else:
+        table_names = tables
+
+    table_comments = {}
+
+    for table_name in table_names:
+        try:
+            # 获取表注释
+            table_comment = inspector.get_table_comment(table_name)
+            # 如果注释存在且不为None，则添加到字典中
+            if table_comment and table_comment['text'] is not None:
+                table_comments[table_name] = table_comment['text']
+            else:
+                # 如果没有注释，可以设置为空字符串或None
+                table_comments[table_name] = ""
+        except SQLAlchemyError as e:
+            print(f"获取表 {table_name} 的注释时出错: {e}")
+            table_comments[table_name] = ""
+    return table_comments
+
+
 def execute_sql(sql):
     # 使用连接执行SQL语句
     with engine.connect() as connection:
