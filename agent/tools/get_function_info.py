@@ -1,24 +1,23 @@
 from .copilot.utils.call_llm_test import call_llm
-from .tools_def import draw_graph, query_database, explain_data
-
+from .tools_def import draw_graph, query_database, explain_data, exe_sql
 
 FUNCTION_DICT = {
-    "query_database": query_database,
+    # "query_database": query_database,
     "draw_graph": draw_graph,
     "explain_data": explain_data,
-
+    "exe_sql": exe_sql,
 }
 
 FUNCTION_IMPORT = {
-    query_database: "from agent.tools.tools_def import query_database",
+    # query_database: "from agent.tools.tools_def import query_database",
     explain_data: "from agent.tools.tools_def import explain_data",
     draw_graph: "from agent.tools.tools_def import draw_graph",
-
+    exe_sql: "from agent.tools.tools_def import exe_sql",
 }
 
 ASSIST_FUNCTION_DICT = {
-    query_database: [explain_data],
-
+    # query_database: [explain_data],
+    exe_sql: [explain_data],
 }
 
 IMPORTANT_FUNC = []  # ["query_database"]
@@ -52,7 +51,24 @@ draw_graph, query_database
     return "question:" + question + pre_prompt + function_prompt + str(FUNCTION_DESCRIPTION) + example_code
 
 
-def get_function_info(question, llm):
+def get_function_info(question, llm, use_all_functions=False):
+    if use_all_functions:
+        function_set = set(FUNCTION_DICT.values())
+        for main_function in FUNCTION_DICT.values():
+            assist_functions = ASSIST_FUNCTION_DICT.get(main_function)
+            if assist_functions:
+                for assist_function in assist_functions:
+                    function_set.add(assist_function)
+        function_info = ""
+        function_import = []
+        for function in function_set:
+            function_info += "\n" + str(function.__doc__) + "\n"
+            import_list = FUNCTION_IMPORT.get(function)
+            if import_list:
+                function_import.append(import_list)
+
+        return function_set, function_info, function_import
+
     function_prompt = get_function_prompt(question)
     function_list_str = call_llm(function_prompt, llm).content
     if function_list_str == "solved":

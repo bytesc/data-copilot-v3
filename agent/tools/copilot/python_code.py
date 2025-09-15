@@ -106,10 +106,10 @@ without any additional comments, explanations or cmds !!!
             continue
 
 
-def draw_graph_func(question, data, llm, retries=2):
+def draw_graph_func(question, data, llm, col_explanation=None, retries=2):
     exp = None
     for i in range(retries):
-        question = get_ask_graph_prompt(question)
+        question = get_ask_graph_prompt(question, col_explanation)
         err_msg = ""
         for j in range(retries):
             code = get_py_code_with_data(question + err_msg, data, llm)

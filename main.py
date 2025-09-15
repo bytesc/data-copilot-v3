@@ -1,5 +1,5 @@
 import mimetypes
-
+from typing import List, Optional
 import pandas as pd
 import sqlalchemy
 import uvicorn
@@ -48,6 +48,7 @@ async def read_static_file(request: Request, filename: str):
 
 class AgentInput(BaseModel):
     question: str
+    tables: Optional[List[str]] = None
 
 
 class AgentInputDict(BaseModel):
@@ -62,7 +63,7 @@ class ReviewInput(BaseModel):
 
 @app.post("/api/ask-agent/")
 async def ask_agent(request: Request, user_input: AgentInput):
-    ans, code = cot_agent(user_input.question)
+    ans, code = cot_agent(user_input.question, user_input.tables, use_all_functions=True)
     print(ans)
     if ans:
         processed_data = {
@@ -188,8 +189,10 @@ async def cot_chat(request: Request, user_input: AgentInput):
     return JSONResponse(content=processed_data)
 
 
-from agent.tools.copilot.utils.read_db import get_rows_from_all_tables, get_table_comments_dict
-from agent.tools.tools_def import engine, llm
+from agent.tools.copilot.utils.read_db import get_rows_from_all_tables, get_table_comments_dict, execute_select
+from agent.tools.tools_def import engine, llm, draw_graph
+
+
 @app.post("/api/db-slice/")
 async def db_slice(request: Request):
     first_five_rows = get_rows_from_all_tables(engine, None, num=5)
@@ -218,7 +221,6 @@ async def db_slice(request: Request):
 
 @app.post("/api/table-comments/")
 async def table_comments(request: Request):
-    # 获取所有表的注释
     table_comments = get_table_comments_dict(engine, None)
     processed_data = {
         "ans": table_comments,
@@ -241,8 +243,7 @@ async def get_sql(request: Request):
 
 @app.post("/api/exe-sql/")
 async def exe_sql(request: Request, user_input: AgentInput):
-    AgentInput.question
-    ans = {}
+    ans = execute_select(engine, AgentInput.question)
     processed_data = {
         "ans": ans,
         "type": "success",
@@ -255,8 +256,7 @@ async def exe_sql(request: Request, user_input: AgentInput):
 @app.post("/api/get-graph/")
 async def get_graph_api(request: Request, user_input: AgentInputDict):
     df = pd.DataFrame.from_dict(user_input.data)
-    user_input.question, df
-    ans = ""
+    ans = draw_graph(user_input.question, df)
     if ans:
         processed_data = {
             "question": user_input.question,
@@ -324,7 +324,6 @@ async def upload_txt(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"File processing error: {str(e)}")
     return JSONResponse(content=result)
-
 
 
 if __name__ == "__main__":

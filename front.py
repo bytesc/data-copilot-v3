@@ -1,3 +1,5 @@
+from typing import Optional, List
+
 import httpx
 from pywebio.session import set_env
 from pywebio.input import input, TEXT, textarea, file_upload, select, checkbox
@@ -9,14 +11,20 @@ from data_access.read_db import get_rows_from_all_tables, get_table_comments_dic
 from utils.get_config import config_data
 import base64
 
-SELECT_TABLES=""
-SELECT_LABELS=""
+SELECT_TABLES = []
+SELECT_LABELS = []
 
-def ai_agent_api(question: str, path: str = "/ask-agent/", url="http://127.0.0.1:" + str(config_data["server_port"])):
+
+def ai_agent_api(question: str, tables: Optional[List[str]] = None, path: str = "/api/ask-agent/",
+                 url="http://127.0.0.1:" + str(config_data["server_port"])):
     # Use httpx to send a request to the /ask-agent/ endpoint of another server
     with httpx.Client(timeout=180.0) as client:
         try:
-            response = client.post(url + path, json={"question": question})
+            payload = {"question": question}
+            if tables:
+                payload["tables"] = tables
+
+            response = client.post(url + path, json=payload)
             # Check response status code
             if response.status_code == 200:
                 print(response.json()["ans"])
@@ -130,7 +138,6 @@ def handle_table_selection(table_options):
     SELECT_TABLES = selected_tables
     put_markdown(f"You have selected: `{', '.join(selected_tables)}`")
     if selected_tables:
-        put_markdown("### Selected Tables")
         selected_labels = []
         for table_value in selected_tables:
             for opt in table_options:
@@ -172,7 +179,7 @@ def main():
 
     while True:
         table_pre = ""
-        if SELECT_TABLES != "":
+        if SELECT_TABLES != []:
             table_pre = "use table:" + str(SELECT_TABLES) + " only!!! \n" + str(SELECT_LABELS) + "\n"
         question = textarea("Enter your question here:", type=TEXT, rows=2)
         put_markdown("## " + question)
@@ -183,7 +190,7 @@ def main():
             full_question = question
 
         with put_loading():
-            response = ai_agent_api(table_pre + full_question, "/api/ask-agent/")
+            response = ai_agent_api(table_pre + full_question, SELECT_TABLES, "/api/ask-agent/")
         if response:
             conversation_history.append(f"Q: {question}")
             conversation_history.append(f"A: {response}")

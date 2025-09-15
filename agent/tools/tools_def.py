@@ -4,6 +4,7 @@ import sqlalchemy
 from agent.utils.get_config import config_data
 from agent.utils.llm_access.LLM import get_llm
 from .copilot.data_explanation import get_llm_data_explanation_func
+from .copilot.utils.read_db import execute_select
 
 DATABASE_URL = config_data['mysql']
 engine = sqlalchemy.create_engine(DATABASE_URL)
@@ -46,15 +47,16 @@ def query_database(question: str, df_cols: str | list = None) -> pd.DataFrame:
     return result
 
 
-def draw_graph(question: str, data: pd.DataFrame) -> str:
+def draw_graph(question: str, data: pd.DataFrame, col_explanation: str = None) -> str:
     """
-    draw_graph(question: str, data: pd.DataFrame) -> str:
+    draw_graph(question: str, data: pd.DataFrame, col_explanation: str = None) -> str:
     Draw graph based on natural language graph type and data provided in a pandas DataFrame.
     Returns an url path string of the graph.
 
     Args:
     - question (str): Natural language graph type.
     - data (pd.DataFrame): A pandas DataFrame for providing drawing data.
+    - col_explanation (str, optional): Natural language to describe the meanings of columns.
 
     Returns:
     - str: url path string of the output graph.(e.g. "http://127.0.0.1:8003/tmp_imgs/mlkjcvep.png").
@@ -65,25 +67,42 @@ def draw_graph(question: str, data: pd.DataFrame) -> str:
             '月份': ['1月', '2月', '3月', '4月', '5月'],
             '销售额': [200, 220, 250, 210, 230]
         })
-        graph_url = draw_graph("画折线图", data)
+        graph_url = draw_graph("draw line graph", data)
         # Output(str):
         # "http://127.0.0.1:8003/tmp_imgs/ekhidpcl.png"
+
+        data = pd.DataFrame({
+            'Gender': [1, 2, 3],
+            'Sales Percentage': [35, 45, 20]
+        })
+        graph_url = draw_graph("draw pie chart", data, "Gender: 1 means male, 2 means female, 3 means not known;")
+        # Output(str):
+        # "http://127.0.0.1:8003/tmp_imgs/ewcdkdkl.png"
+
+        data = pd.DataFrame({
+            'Month': ['January', 'February', 'March', 'April', 'May', 'June'],
+            'Sales Revenue (USD)': [12000, 15000, 18000, 13500, 16500, 19500]
+        })
+        graph_url = draw_graph("draw bar chart", data)
+        # Output(str):
+        # "http://127.0.0.1:8003/tmp_imgs/glddvysc.png"
     ```
     """
-    result = draw_graph_func(question, data, llm)
+    result = draw_graph_func(question, data, llm, col_explanation)
     result = STATIC_URL + result[2:]
     return result
 
 
-def explain_data(question: str, data: pd.DataFrame) -> str:
+def explain_data(question: str, data: pd.DataFrame, col_explanation: str = None) -> str:
     """
-    explain_data(question: str, data: pd.DataFrame) -> str:
+    explain_data(question: str, data: pd.DataFrame, col_explanation: str = None) -> str:
     Explain the data provided in a pandas DataFrame based on a natural language question. This function must be used after important dataframe assigned.
     Returns a str of natural language data analysis.
 
     Args:
     - question (str): Natural language question.
     - data (pd.DataFrame): A pandas DataFrame for analysis.
+    - col_explanation (str, optional): Natural language to describe the meanings of columns.
 
     Returns:
     - str: Explanation of data
@@ -94,10 +113,37 @@ def explain_data(question: str, data: pd.DataFrame) -> str:
             'month': ['1', '2', '3', '4', '5'],
             'sales': [200, 220, 250, 210, 230]
         })
-        data_description = explain_data("how is the sales condition?", data)
+        data_description = explain_data("how is the sales condition?", data, "month: 1 means Jan and so forth")
         # Output(str):
         # "Based on the data..."
     ```
     """
-    ans = get_llm_data_explanation_func(question, data, llm)
+    ans = get_llm_data_explanation_func(question, data, llm, col_explanation)
+    return ans
+
+
+def exe_sql(sql: str) -> pd.DataFrame:
+    """
+    exe_sql(sql: str) -> pd.DataFrame:
+    Execute the sql query string.
+    Returns the query results in pandas DataFrame.
+
+    Args:
+    - sql (str): query string.
+
+    Returns:
+    - pd.DataFrame: A DataFrame containing the results of the database query.
+
+    Example:
+    ```python
+        ans_df = exe_sql('SELECT lesson_id, lesson_name, grade FROM lessons WHERE grade > 90')
+        # Output(pd.DataFrame):
+        #        lesson_id lesson_name grade
+        # 0        001  Mathematics     99.00
+        # 1        002      English     95.50
+        # 2        005     Chemistry     92.00
+        # ... and so on
+        ```
+    """
+    ans = execute_select(engine, sql)
     return ans

@@ -8,7 +8,7 @@ import pandas as pd
 pd.set_option('display.max_columns', None)
 
 
-def get_llm_data_explanation_func(question, data, llm, max_length=10000):
+def get_llm_data_explanation_func(question, data, llm, col_explanation=None, max_length=10000):
     data_str = data.to_string()
     example_prompt = ""
     if len(data_str) > max_length:
@@ -27,6 +27,10 @@ Here is the question:
 Here is the dataframe: 
 """ + data_str
 
+    col_prompt = ""
+    if col_explanation:
+        col_prompt = "\ndf columns explanation: "+str(col_explanation)+"\n"
+
     end_prompt = """
 Remind:
 1. Please analyze and explain the trends, patterns, and cycles in the data based on the question.
@@ -35,7 +39,7 @@ Remind:
 4. Just describe the data, do not use any phrase to explain what you are doing.
 """
 
-    final_prompt = pre_prompt + question + "\n" + example_prompt + data_prompt + end_prompt
+    final_prompt = pre_prompt + question + "\n" + example_prompt + data_prompt + col_prompt + end_prompt
     ans = call_llm_test.call_llm(final_prompt, llm)
 
     return ans.content

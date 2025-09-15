@@ -2,7 +2,7 @@
 from .path_tools import generate_img_path
 
 
-def get_ask_graph_prompt(question, tmp_file=False):
+def get_ask_graph_prompt(question,col_explanation=None, tmp_file=False):
     pre_prompt = """
 Please use matplotlib to draw a graph based on the question. 
 No calculation in this step, just draw graph with given data
@@ -28,10 +28,13 @@ def func(data):
 Remind:
 - Pay attention to the scale division of the horizontal axis and the orientation of the text to avoid excessive density of the horizontal axis and overlapping text!!!
 """
+    col_prompt = ""
+    if col_explanation:
+        col_prompt = "\ndf columns explanation: "+str(col_explanation)+"\n"
     if not tmp_file:
-        return "question:"+question + pre_prompt + "`"+generate_img_path()+"`"+example_code
+        return "question:"+question + pre_prompt + "`"+generate_img_path()+"`"+example_code+col_prompt
     else:
-        return "question:"+question + pre_prompt + "./tmp_imgs/tmp.png" + example_code
+        return "question:"+question + pre_prompt + "./tmp_imgs/tmp.png" + example_code+col_prompt
 
 
 
