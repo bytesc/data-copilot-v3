@@ -172,6 +172,31 @@ def execute_sql(sql):
             return e
 
 
+def execute_sql_2(sql):
+    with engine.connect() as connection:
+        try:
+            # 分割SQL语句，移除空语句和空白
+            statements = [stmt.strip() for stmt in sql.split(';') if stmt.strip()]
+
+            executed_count = 0
+            for statement in statements:
+                if statement:  # 确保不是空字符串
+                    result = connection.execute(text(statement))
+                    executed_count += 1
+                    print(f"Executed statement {executed_count}: {statement[:100]}...")
+
+            # 提交所有更改
+            connection.commit()
+            return executed_count
+
+        except SQLAlchemyError as e:
+            # 如果发生错误，回滚事务
+            connection.rollback()
+            # 打印错误信息
+            print(f"An error occurred at statement {executed_count + 1}: {e}")
+            raise e
+
+
 def execute_select(sql):
     try:
         with engine.connect() as connection:
