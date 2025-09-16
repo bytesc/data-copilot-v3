@@ -179,8 +179,8 @@ def main():
 
     while True:
         table_pre = ""
-        if SELECT_TABLES != []:
-            table_pre = "use table:" + str(SELECT_TABLES) + " only!!! \n" + str(SELECT_LABELS) + "\n"
+        # if SELECT_TABLES != []:
+        #     table_pre = "use table:" + str(SELECT_TABLES) + " only!!! \n" + str(SELECT_LABELS) + "\n"
         question = textarea("Enter your question here:", type=TEXT, rows=2)
         put_markdown("## " + question)
         if conversation_history:
@@ -202,4 +202,4 @@ def main():
 
 
 if __name__ == '__main__':
-    start_server(main, port=8015, debug=True)
+    start_server(main, port=8010, debug=True)
