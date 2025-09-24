@@ -4,7 +4,7 @@ from .tools_def import draw_graph, query_database, explain_data, exe_sql
 FUNCTION_DICT = {
     # "query_database": query_database,
     "draw_graph": draw_graph,
-    "explain_data": explain_data,
+    # "explain_data": explain_data,
     "exe_sql": exe_sql,
 }
 

@@ -193,7 +193,7 @@ def main():
             response = ai_agent_api(table_pre + full_question, SELECT_TABLES, "/api/ask-agent/")
         if response:
             conversation_history.append(f"Q: {question}")
-            conversation_history.append(f"A: {response}")
+            # conversation_history.append(f"A: {response}")
 
             put_markdown(response, sanitize=False)
 
@@ -202,4 +202,4 @@ def main():
 
 
 if __name__ == '__main__':
-    start_server(main, port=8010, debug=True)
+    start_server(main, port=8037, debug=True)

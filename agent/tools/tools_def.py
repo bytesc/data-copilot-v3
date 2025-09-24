@@ -50,11 +50,11 @@ def query_database(question: str, df_cols: str | list = None) -> pd.DataFrame:
 def draw_graph(question: str, data: pd.DataFrame, col_explanation: str = None) -> str:
     """
     draw_graph(question: str, data: pd.DataFrame, col_explanation: str = None) -> str:
-    Draw graph based on natural language graph type and data provided in a pandas DataFrame.
+    Draw graph based on natural language graph description and data provided in a pandas DataFrame.
     Returns an url path string of the graph.
 
     Args:
-    - question (str): Natural language graph type.
+    - question (str): Natural language graph type and other requirements.
     - data (pd.DataFrame): A pandas DataFrame for providing drawing data.
     - col_explanation (str, optional): Natural language to describe the meanings of columns.
 
@@ -67,7 +67,7 @@ def draw_graph(question: str, data: pd.DataFrame, col_explanation: str = None) -
             '月份': ['1月', '2月', '3月', '4月', '5月'],
             '销售额': [200, 220, 250, 210, 230]
         })
-        graph_url = draw_graph("draw line graph", data)
+        graph_url = draw_graph("draw line graph, use red line", data)
         # Output(str):
         # "http://127.0.0.1:8003/tmp_imgs/ekhidpcl.png"
 
@@ -83,7 +83,7 @@ def draw_graph(question: str, data: pd.DataFrame, col_explanation: str = None) -
             'Month': ['January', 'February', 'March', 'April', 'May', 'June'],
             'Sales Revenue (USD)': [12000, 15000, 18000, 13500, 16500, 19500]
         })
-        graph_url = draw_graph("draw bar chart", data)
+        graph_url = draw_graph("draw bar chart, use different color for each bar", data)
         # Output(str):
         # "http://127.0.0.1:8003/tmp_imgs/glddvysc.png"
     ```
