@@ -6,7 +6,6 @@ from matplotlib import pyplot as plt
 
 from agent.utils.llm_access.LLM import get_llm
 from .copilot.examples.path_tools import generate_img_path
-from .llm_analysis.llm_predict_hdb import llm_predict_hdb_func, get_llm_predict_hdb_info
 
 from .tools_def import engine, STATIC_URL
 

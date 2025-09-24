@@ -17,7 +17,7 @@ FUNCTION_IMPORT = {
 
 ASSIST_FUNCTION_DICT = {
     # query_database: [explain_data],
-    exe_sql: [explain_data],
+    # exe_sql: [explain_data],
 }
 
 IMPORTANT_FUNC = []  # ["query_database"]
