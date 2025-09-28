@@ -167,7 +167,7 @@ def cot_agent(question, tables=None, use_all_functions=False, retries=2, print_r
 
                     return ans, code
                 except Exception as e:
-                    err_msg = str(e) + "\n```python\n" + code + "\n```\n"
+                    err_msg = "\n" + str(e) + "\n```python\n" + code + "\n```\n"
                     exp = e
                     print(e)
                     continue

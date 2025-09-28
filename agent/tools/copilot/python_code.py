@@ -119,7 +119,7 @@ def draw_graph_func(question, data, llm, col_explanation=None, retries=2):
                 result = execute_py_code_with_data(code, data, assert_png_file)
                 return result
             except Exception as e:
-                err_msg = str(e) + "\n```python\n" + code + "\n```\n"
+                err_msg = "\n" + str(e) + "\n```python\n" + code + "\n```\n"
                 print(e)
                 exp = e
                 continue
