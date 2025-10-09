@@ -65,7 +65,7 @@ def func(data_dict):
 
 Remind:
 - Pay attention to the scale division of the horizontal axis and the orientation of the text to avoid excessive density of the horizontal axis and overlapping text!!!
-- You can overlay different layers of bar charts or line graphs to compare something.
+- You should overlay different layers of different color bar charts or line graphs when comparing something.
 """
     col_prompt = ""
     if col_explanation:

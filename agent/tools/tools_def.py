@@ -119,17 +119,21 @@ def draw_compare_graph(question: str, data_dict: dict, col_explanation: str = No
                 '库存量': [100, 90, 80, 95, 85]
             })
         }
-        graph_url = draw_graph("draw line graph, use red line", data_dict)
+        graph_url = draw_compare_graph("draw line graph", data_dict)
         # Output(str):
         # "http://127.0.0.1:8003/tmp_imgs/ekhidpcl.png"
 
         data_dict = {
-            'gender_data': pd.DataFrame({
+            'group A': pd.DataFrame({
                 'Gender': [1, 2, 3],
                 'Sales Percentage': [35, 45, 20]
+            }),
+            'group B': pd.DataFrame({
+                'Gender': [1, 2, 3],
+                'Sales Percentage': [31, 59, 3]
             })
         }
-        graph_url = draw_graph("draw pie chart", data_dict, "Gender: 1 means male, 2 means female, 3 means not known;")
+        graph_url = draw_compare_graph("draw pie chart", data_dict, "use blend bar layers to compare two groups. Gender: 1 means male, 2 means female, 3 means not known;")
         # Output(str):
         # "http://127.0.0.1:8003/tmp_imgs/ewcdkdkl.png"
 
@@ -139,7 +143,7 @@ def draw_compare_graph(question: str, data_dict: dict, col_explanation: str = No
                 'Sales Revenue (USD)': [12000, 15000, 18000, 13500, 16500, 19500]
             })
         }
-        graph_url = draw_graph("draw bar chart, use different color for each bar", data_dict)
+        graph_url = draw_compare_graph("draw bar chart, use different color for each bar", data_dict)
         # Output(str):
         # "http://127.0.0.1:8003/tmp_imgs/glddvysc.png"
     ```
