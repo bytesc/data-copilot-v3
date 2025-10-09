@@ -93,6 +93,61 @@ def draw_graph(question: str, data: pd.DataFrame, col_explanation: str = None) -
     return result
 
 
+def draw_compare_graph(question: str, data_dict: dict, col_explanation: str = None) -> str:
+    """
+    draw_compare_graph(question: str, data_dict: dict, col_explanation: str = None) -> str:
+    Draw graph to compare something based on natural language graph description and data provided in a dictionary of pandas DataFrames.
+    Returns an url path string of the graph.
+
+    Args:
+    - question (str): Natural language graph type and other requirements.
+    - data_dict (dict): A dictionary with string keys and pandas DataFrame values for providing drawing data.
+    - col_explanation (str, optional): Natural language to describe the meanings of columns.
+
+    Returns:
+    - str: url path string of the output graph.(e.g. "http://127.0.0.1:8003/tmp_imgs/mlkjcvep.png").
+
+    Example:
+    ```python
+        data_dict = {
+            'sales_data': pd.DataFrame({
+                '月份': ['1月', '2月', '3月', '4月', '5月'],
+                '销售额': [200, 220, 250, 210, 230]
+            }),
+            'inventory_data': pd.DataFrame({
+                '月份': ['1月', '2月', '3月', '4月', '5月'],
+                '库存量': [100, 90, 80, 95, 85]
+            })
+        }
+        graph_url = draw_graph("draw line graph, use red line", data_dict)
+        # Output(str):
+        # "http://127.0.0.1:8003/tmp_imgs/ekhidpcl.png"
+
+        data_dict = {
+            'gender_data': pd.DataFrame({
+                'Gender': [1, 2, 3],
+                'Sales Percentage': [35, 45, 20]
+            })
+        }
+        graph_url = draw_graph("draw pie chart", data_dict, "Gender: 1 means male, 2 means female, 3 means not known;")
+        # Output(str):
+        # "http://127.0.0.1:8003/tmp_imgs/ewcdkdkl.png"
+
+        data_dict = {
+            'monthly_sales': pd.DataFrame({
+                'Month': ['January', 'February', 'March', 'April', 'May', 'June'],
+                'Sales Revenue (USD)': [12000, 15000, 18000, 13500, 16500, 19500]
+            })
+        }
+        graph_url = draw_graph("draw bar chart, use different color for each bar", data_dict)
+        # Output(str):
+        # "http://127.0.0.1:8003/tmp_imgs/glddvysc.png"
+    ```
+    """
+    result = draw_graph_func(question, data_dict, llm, col_explanation)
+    result = STATIC_URL + result[2:]
+    return result
+
 def explain_data(question: str, data: pd.DataFrame, col_explanation: str = None) -> str:
     """
     explain_data(question: str, data: pd.DataFrame, col_explanation: str = None) -> str:
