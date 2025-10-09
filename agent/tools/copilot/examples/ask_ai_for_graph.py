@@ -16,6 +16,7 @@ Here is an example:
 def func(data):
     import pandas as pd
     import math
+    import numpy as np
     import PIL
     import matplotlib
     import matplotlib.pyplot as plt
@@ -51,6 +52,7 @@ Here is an example:
 def func(data_dict):
     import pandas as pd
     import math
+    import numpy as np
     import PIL
     import matplotlib
     import matplotlib.pyplot as plt

@@ -14,7 +14,7 @@ STATIC_URL = config_data['static_path']
 llm = get_llm()
 
 from .copilot.sql_code import query_database_func
-from .copilot.python_code import draw_graph_func
+from .copilot.python_code import draw_graph_func, draw_compare_graph_func
 
 
 def query_database(question: str, df_cols: str | list = None) -> pd.DataFrame:
@@ -101,7 +101,7 @@ def draw_compare_graph(question: str, data_dict: dict, col_explanation: str = No
 
     Args:
     - question (str): Natural language graph type and other requirements.
-    - data_dict (dict): A dictionary with string keys and pandas DataFrame values for providing drawing data.
+    - data_dict (dict): A dictionary with string keys and pandas DataFrame values for providing drawing data. The key can only be a string and the value can only be a pandas DataFrame.
     - col_explanation (str, optional): Natural language to describe the meanings of columns.
 
     Returns:
@@ -144,7 +144,7 @@ def draw_compare_graph(question: str, data_dict: dict, col_explanation: str = No
         # "http://127.0.0.1:8003/tmp_imgs/glddvysc.png"
     ```
     """
-    result = draw_graph_func(question, data_dict, llm, col_explanation)
+    result = draw_compare_graph_func(question, data_dict, llm, col_explanation)
     result = STATIC_URL + result[2:]
     return result
 
