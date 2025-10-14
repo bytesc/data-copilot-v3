@@ -8,6 +8,7 @@ cache/
 exports/
 tmp_imgs/*.png
 tmp_imgs/*.html
+tmp_imgs/*.csv
 
 temp.png
 temp.html

@@ -1,4 +1,5 @@
 from .utils import call_llm_test
+from .utils.code_insert import insert_lines_into_function
 
 from .utils.parse_output import parse_generated_python_code
 
@@ -8,6 +9,10 @@ from .examples.ask_ai_for_graph import get_ask_graph_prompt, get_ask_compare_gra
 
 import logging
 import pandas as pd
+
+IMPORTANT_MODULE = ["import math"]
+THIRD_MODULE = ["import pandas as pd", "import numpy as np"]
+
 
 pd.set_option('display.max_columns', None)
 
@@ -170,6 +175,8 @@ def draw_graph_func(question, data, llm, col_explanation=None, retries=2):
             if code is None:
                 continue
             try:
+                code = insert_lines_into_function(code, IMPORTANT_MODULE)
+                code = insert_lines_into_function(code, THIRD_MODULE)
                 result = execute_py_code_with_data(code, data, assert_png_file)
                 return result
             except Exception as e:
@@ -190,6 +197,8 @@ def draw_compare_graph_func(question, data_dict, llm, col_explanation=None, retr
             if code is None:
                 continue
             try:
+                code = insert_lines_into_function(code, IMPORTANT_MODULE)
+                code = insert_lines_into_function(code, THIRD_MODULE)
                 result = execute_py_code_with_data(code, data_dict, assert_png_file)
                 return result
             except Exception as e:

@@ -152,6 +152,7 @@ def draw_compare_graph(question: str, data_dict: dict, col_explanation: str = No
     result = STATIC_URL + result[2:]
     return result
 
+
 def explain_data(question: str, data: pd.DataFrame, col_explanation: str = None) -> str:
     """
     explain_data(question: str, data: pd.DataFrame, col_explanation: str = None) -> str:

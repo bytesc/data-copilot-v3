@@ -38,7 +38,15 @@ def wrap_html_url_with_html_a(s):
     url_regex = re.compile(
         r'(http[s]?://[^"]+\.(?:html))'
     )
-    return re.sub(url_regex, r'<a href="\1" target="_blank">Data</a>', s)+"\n"
+    return re.sub(url_regex, r'<a href="\1" target="_blank">Draw Graph With Data</a>', s)+"\n"
+
+
+def wrap_csv_url_with_html_a(s):
+    url_regex = re.compile(
+        r'(http[s]?://[^"]+\.(?:csv))'
+    )
+    return re.sub(url_regex, r'<a href="\1" download target="_blank">Download Data CSV</a>', s) + "\n"
+
 
 def is_iframe_tag(s):
     iframe_regex = re.compile(

@@ -3,18 +3,19 @@ import logging
 import pandas as pd
 
 from .tools.base_knowledge.get_base_knowledge import get_base_knowledge
+from .tools.copilot.utils.code_insert import insert_lines_into_function
 from .tools.tools_def import engine, llm, query_database, exe_sql
 
 from .tools.copilot.python_code import get_py_code
 from .tools.copilot.utils.code_executor import execute_py_code
 from .tools.copilot.sql_code import get_db_info_prompt
 
-from .utils.code_insert import insert_lines_into_function
 from .tools.get_function_info import get_function_info
 
-from .ans_review import get_ans_review
-from .utils.final_output_parse import df_to_markdown, wrap_html_url_with_markdown_link, wrap_html_url_with_html_a
+from .utils.final_output_parse import df_to_markdown, wrap_html_url_with_html_a, \
+    wrap_csv_url_with_html_a
 from .utils.final_output_parse import wrap_png_url_with_markdown_image, is_png_url, is_iframe_tag
+from .utils.pd_to_csv import pd_to_csv
 from .utils.pd_to_walker import pd_to_walker
 
 IMPORTANT_MODULE = ["import math"]
@@ -54,31 +55,31 @@ Here is the functions you can import and use:
 """
     module_prompt = "You can only use the third party function in " + str(THIRD_MODULE) + " !!!"
 
-#     example_code = """
-# Here is an example:
-# ```python
-# def func():
-#     import pandas as pd
-#     import math
-#     # generate code to perform operations here
-#
-#     original_question = "show me the grades of a A01 class?"
-#
-#     yield "A01 class’s grades are as follows:"  # yield some information and explanation
-#     yield "use table: stu_info ,stu_grade"  # yield tables names before query database function
-#     df = query_database("The grades of a A01 class, use table stu_info ,stu_grade", "Name, Course_name, Grade")
-#     yield df  # the result of each step and function call
-#     # None or empty DataFrame return handling for each function call.
-#     if df == None:
-#         yield "The grades for this class were not found in the database"
-#     else:
-#         data_description = explain_data("Analysis A01 class’s grades", df)
-#         yield data_description
-#         yield "The grade histogram is as follows:"
-#         path = draw_graph("Draw a bar chart", df)
-#         yield path
-# ```
-# """
+    #     example_code = """
+    # Here is an example:
+    # ```python
+    # def func():
+    #     import pandas as pd
+    #     import math
+    #     # generate code to perform operations here
+    #
+    #     original_question = "show me the grades of a A01 class?"
+    #
+    #     yield "A01 class’s grades are as follows:"  # yield some information and explanation
+    #     yield "use table: stu_info ,stu_grade"  # yield tables names before query database function
+    #     df = query_database("The grades of a A01 class, use table stu_info ,stu_grade", "Name, Course_name, Grade")
+    #     yield df  # the result of each step and function call
+    #     # None or empty DataFrame return handling for each function call.
+    #     if df == None:
+    #         yield "The grades for this class were not found in the database"
+    #     else:
+    #         data_description = explain_data("Analysis A01 class’s grades", df)
+    #         yield data_description
+    #         yield "The grade histogram is as follows:"
+    #         path = draw_graph("Draw a bar chart", df)
+    #         yield path
+    # ```
+    # """
 
     example_code = """
     Here is an example: 
@@ -141,12 +142,15 @@ def cot_agent(question, tables=None, use_all_functions=False, retries=2, print_r
                         if isinstance(item, pd.DataFrame):
                             if item.index.size > 10:
                                 cot_ans += df_to_markdown(item.head(print_rows)) + \
-                                           "\nfirst {} rows of {}\n".format(print_rows, len(item))
+                                           "\nfirst {} rows of {}".format(print_rows, len(item)) + \
+                                           "\nthe data above are just slice example, download csv to get full data\n"
                             else:
                                 cot_ans += df_to_markdown(item)
                             html_link = pd_to_walker(item)
+                            csv_link = pd_to_csv(item)
                             # cot_ans += wrap_html_url_with_markdown_link(html_link)
                             cot_ans += wrap_html_url_with_html_a(html_link)
+                            cot_ans += wrap_csv_url_with_html_a(csv_link)
                         elif isinstance(item, str) and is_png_url(item):
                             cot_ans += "\n" + wrap_png_url_with_markdown_image(item) + "\n"
                         elif is_iframe_tag(str(item)):
@@ -158,7 +162,7 @@ def cot_agent(question, tables=None, use_all_functions=False, retries=2, print_r
                     ans = ""
                     # if rag_ans and rag_ans != "":
                     #     ans += "### Base knowledge: \n" + rag_ans + "\n\n"
-                    ans += "### COT Result: \n" + cot_ans + "\n"
+                    ans += "### Result: \n" + cot_ans + "\n"
                     # print(ans)
                     # review_ans = get_ans_review(question, ans, code)
                     # ans += "## Summarize and review: \n" + review_ans + "\n"
@@ -188,12 +192,15 @@ def exe_cot_code(code, retries=2, print_rows=10):
                 if isinstance(item, pd.DataFrame):
                     if item.index.size > 10:
                         cot_ans += df_to_markdown(item.head(print_rows)) + \
-                                   "\nfirst {} rows of {}\n".format(print_rows, len(item))
+                                   "\nfirst {} rows of {}".format(print_rows, len(item)) + \
+                                   "\nthe data above are just slice example, download csv to get full data\n"
                     else:
                         cot_ans += df_to_markdown(item)
                     html_link = pd_to_walker(item)
+                    csv_link = pd_to_csv(item)
                     # cot_ans += wrap_html_url_with_markdown_link(html_link)
                     cot_ans += wrap_html_url_with_html_a(html_link)
+                    cot_ans += wrap_csv_url_with_html_a(csv_link)
                 elif isinstance(item, str) and is_png_url(item):
                     cot_ans += "\n" + wrap_png_url_with_markdown_image(item) + "\n"
                 elif isinstance(item, str) and is_iframe_tag(item):
@@ -207,7 +214,7 @@ def exe_cot_code(code, retries=2, print_rows=10):
             if j < retries:
                 continue
         # ans = "### Base knowledge: \n" + rag_ans + "\n\n"
-        ans = "### COT Result: \n" + cot_ans + "\n"
+        ans = "### Result: \n" + cot_ans + "\n"
         # print(ans)
         return ans
     return None
