@@ -5,6 +5,7 @@ from agent.utils.get_config import config_data
 from agent.utils.llm_access.LLM import get_llm
 from .copilot.data_explanation import get_llm_data_explanation_func
 from .copilot.utils.read_db import execute_select
+from .data_trans.download_csv_to_pd import download_csv_to_dataframe, extract_csv_filename_from_url, read_csv_from_local
 
 DATABASE_URL = config_data['mysql']
 engine = sqlalchemy.create_engine(DATABASE_URL)
@@ -30,6 +31,7 @@ def query_database(question: str, df_cols: str | list = None) -> pd.DataFrame:
     Returns:
     - pd.DataFrame: A DataFrame containing the results of the database query.
         The DataFrame includes the columns provided in df_cols(the second args)
+    returns None in case of error
 
     Example:
     ```python
@@ -60,6 +62,7 @@ def draw_graph(question: str, data: pd.DataFrame, col_explanation: str = None) -
 
     Returns:
     - str: url path string of the output graph.(e.g. "http://127.0.0.1:8003/tmp_imgs/mlkjcvep.png").
+    returns None in case of error
 
     Example:
     ```python
@@ -106,6 +109,7 @@ def draw_compare_graph(question: str, data_dict: dict, col_explanation: str = No
 
     Returns:
     - str: url path string of the output graph.(e.g. "http://127.0.0.1:8003/tmp_imgs/mlkjcvep.png").
+    returns None in case of error
 
     Example:
     ```python
@@ -193,6 +197,7 @@ def exe_sql(sql: str) -> pd.DataFrame:
 
     Returns:
     - pd.DataFrame: A DataFrame containing the results of the database query.
+    returns None in case of error
 
     Example:
     ```python
@@ -207,3 +212,27 @@ def exe_sql(sql: str) -> pd.DataFrame:
     """
     ans = execute_select(engine, sql)
     return ans
+
+
+def load_data(url: str) -> pd.DataFrame:
+    """
+    load_data(url: str) -> pd.DataFrame:
+    Load data form a CSV file url
+    Returns the result in a pandas DataFrame.
+
+    Args:
+    - url (str): url string(e.g. http://127.0.0.1:8009/tmp_imgs/imqtzywu.csv).
+
+    Returns:
+    - pd.DataFrame: A DataFrame containing the data in the CSV file.
+    returns None in case of error
+
+    Example:
+    ```python
+        ans_df = load_data("http://127.0.0.1:8009/tmp_imgs/xjfsutvp.csv")
+    ```
+    """
+    file_name = extract_csv_filename_from_url(url)
+    df = read_csv_from_local("./tmp_imgs/"+file_name)
+    return df
+

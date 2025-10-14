@@ -199,6 +199,7 @@ def draw_compare_graph_func(question, data_dict, llm, col_explanation=None, retr
             try:
                 code = insert_lines_into_function(code, IMPORTANT_MODULE)
                 code = insert_lines_into_function(code, THIRD_MODULE)
+                print(code)
                 result = execute_py_code_with_data(code, data_dict, assert_png_file)
                 return result
             except Exception as e:

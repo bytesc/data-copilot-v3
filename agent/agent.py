@@ -114,7 +114,7 @@ Here is the functions you can import and use:
     return cot_prompt, rag_ans, function_import
 
 
-def cot_agent(question, tables=None, use_all_functions=False, retries=2, print_rows=10):
+def cot_agent(question, tables=None, use_all_functions=False, retries=2, print_rows=5):
     exp = None
     for i in range(retries):
         cot_prompt, rag_ans, function_import = get_cot_code_prompt(question, tables, use_all_functions)
@@ -178,7 +178,7 @@ def cot_agent(question, tables=None, use_all_functions=False, retries=2, print_r
     return None, None
 
 
-def exe_cot_code(code, retries=2, print_rows=10):
+def exe_cot_code(code, retries=2, print_rows=5):
     for j in range(retries):
         if code is None:
             continue

@@ -184,7 +184,7 @@ def main():
         question = textarea("Enter your question here:", type=TEXT, rows=2)
         put_markdown("## " + question)
         if conversation_history:
-            context = "\n".join(conversation_history[-6:])
+            context = "\n".join(conversation_history[-4:])
             full_question = f"Context:\n{context}\n\nCurrent Question:\n{question}"
         else:
             full_question = question
@@ -193,7 +193,7 @@ def main():
             response = ai_agent_api(table_pre + full_question, SELECT_TABLES, "/api/ask-agent/")
         if response:
             conversation_history.append(f"Q: {question}")
-            # conversation_history.append(f"A: {response}")
+            conversation_history.append(f"A: {response}")
 
             put_markdown(response, sanitize=False)
 

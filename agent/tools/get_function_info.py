@@ -1,5 +1,5 @@
 from .copilot.utils.call_llm_test import call_llm
-from .tools_def import draw_graph, query_database, explain_data, exe_sql, draw_compare_graph
+from .tools_def import draw_graph, query_database, explain_data, exe_sql, draw_compare_graph, load_data
 
 FUNCTION_DICT = {
     # "query_database": query_database,
@@ -7,14 +7,16 @@ FUNCTION_DICT = {
     "draw_compare_graph": draw_compare_graph,
     # "explain_data": explain_data,
     "exe_sql": exe_sql,
+    "load_data": load_data
 }
 
 FUNCTION_IMPORT = {
-    # query_database: "from agent.tools.tools_def import query_database",
+    query_database: "from agent.tools.tools_def import query_database",
     explain_data: "from agent.tools.tools_def import explain_data",
     draw_graph: "from agent.tools.tools_def import draw_graph",
     draw_compare_graph: "from agent.tools.tools_def import draw_compare_graph",
     exe_sql: "from agent.tools.tools_def import exe_sql",
+    load_data: "from agent.tools.tools_def import load_data",
 }
 
 ASSIST_FUNCTION_DICT = {
@@ -22,7 +24,7 @@ ASSIST_FUNCTION_DICT = {
     # exe_sql: [explain_data],
 }
 
-IMPORTANT_FUNC = []  # ["query_database"]
+IMPORTANT_FUNC = ["load_data"]
 
 # FUNCTION_INFO = {key: func.__doc__ for key, func in FUNCTION_DICT.items()}
 # ASSIST_FUNCTION_INFO = {key: ' '.join(func.__doc__ for func in funcs) for key, funcs in ASSIST_FUNCTION_DICT.items()}
