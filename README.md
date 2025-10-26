@@ -1,6 +1,17 @@
 # data copilot v3
 
 ✨ **基于代码生成和函数调用(function call)的大语言模型(LLM)数据分析智能体**
+支持任意数据集和描述文档一键智能导入与智能图表绘制，通过多智能体协作和上下文长数据记忆，实现精准的自然语言查询与可视化分析。
+
+🚩[English Readme](./README.en.md)
+
+### 相关项目
+- [基于大语言模型 (LLM) 的<u>**可解释型**</u>自然语言数据库查询系统 https://github.com/bytesc/data-copilot-steps](https://github.com/bytesc/data-copilot-steps)
+- [基于大语言模型 (LLM)和并发预测模型的自然语言数据库查询系统 (https://github.com/bytesc/data-copilot-v2](https://github.com/bytesc/data-copilot-v2)
+
+[个人网站：www.bytesc.top](http://www.bytesc.top)
+
+🔔 如有项目相关问题，欢迎在本项目提出`issue`，我一般会在 24 小时内回复。
 
 ## 功能简介
 
@@ -12,14 +23,6 @@
 - 6, 上下文支持非文本长数据记忆，在多轮对话当中实现数据的存取
 - 7, 支持任意数据表格一键导入数据库，支持任意文档生成数据注释标注
 
-🚩[English Readme](./README.en.md)
-
-- [基于大语言模型 (LLM) 的<u>**可解释型**</u>自然语言数据库查询系统 (RAG) https://github.com/bytesc/data-copilot-steps](https://github.com/bytesc/data-copilot-steps)
-- [基于大语言模型 (LLM)和并发预测模型的自然语言数据库查询系统 (RAG) (https://github.com/bytesc/data-copilot-v2](https://github.com/bytesc/data-copilot-v2)
-
-🚩[个人网站：www.bytesc.top](http://www.bytesc.top)
-
-🔔 如有项目相关问题，欢迎在本项目提出`issue`，我一般会在 24 小时内回复。
 
 ## 技术架构
 
